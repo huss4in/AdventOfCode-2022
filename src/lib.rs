@@ -23,7 +23,18 @@ pub trait Challenge {
                 .enumerate()
                 .take(if num == 0 { std::usize::MAX } else { num })
         {
-            println!("\n{}::part{}() -> {}", Self::name(), i + 1, Self::run(func));
+            let time = std::time::Instant::now();
+
+            let result = Self::run(func);
+
+            let elapsed = time.elapsed().as_nanos();
+
+            println!(
+                "{}::part{}() -> {} in {elapsed:?} ns\n",
+                Self::name(),
+                i + 1,
+                result
+            );
         }
     }
 }
@@ -34,3 +45,4 @@ fn read_input_day(num: u32) -> String {
 }
 
 mod day1;
+mod day2;
