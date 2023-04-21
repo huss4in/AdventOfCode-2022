@@ -1,20 +1,28 @@
 #![allow(non_snake_case)]
 
 pub mod prelude {
-    pub use crate::Challenge;
+    pub use crate::Day;
 
     pub use super::day1::Day1;
     pub use super::day2::Day2;
 }
 
-pub trait Challenge {
-    type FUNC;
+type FUNC = &'static dyn Fn(&str) -> u32;
 
-    fn parts() -> Vec<Self::FUNC>;
-    fn input() -> &'static String;
-
-    fn run(func: Self::FUNC) -> String;
+pub trait Day
+where
+    Self: 'static,
+{
     fn name() -> String;
+
+    fn part1(input: &str) -> u32;
+    fn part2(input: &str) -> u32;
+
+    fn parts() -> [FUNC; 2] {
+        [&Self::part1, &Self::part2]
+    }
+
+    fn input() -> &'static String;
 
     fn run_all(num: usize) {
         for (i, func) in
@@ -25,15 +33,16 @@ pub trait Challenge {
         {
             let time = std::time::Instant::now();
 
-            let result = Self::run(func);
+            let result = func(Self::input());
 
-            let elapsed = time.elapsed().as_nanos();
+            let elapsed = time.elapsed().as_micros();
 
             println!(
-                "{}::part{}() -> {} in {elapsed:?} ns\n",
+                "{}::part{}() -> {:<7} in {} ms\n",
                 Self::name(),
                 i + 1,
-                result
+                result,
+                elapsed as f64 / 1000.0,
             );
         }
     }

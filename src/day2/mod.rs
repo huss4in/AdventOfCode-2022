@@ -1,51 +1,72 @@
-#![allow(unused_imports, dead_code, unused_variables)]
-
-use std::cmp::Ordering;
-
-use itertools::Itertools;
+pub use crate::Day;
 
 #[derive(Debug)]
 pub struct Day2;
 
-impl Day2 {
-    pub fn part1(input: &str) -> u32 {
-        input
-            .lines()
-            .map(|line| {
-                let mut chars = line.split_whitespace().map(|s| s.parse::<Game>());
+impl Day for Day2 {
+    fn part1(input: &str) -> u32 {
+        Self::common(input, |split| {
+            let mut plays = split.map(|s| s.parse::<Play>());
 
-                match (chars.next(), chars.next()) {
-                    (Some(Ok(op)), Some(Ok(me))) => {
-                        me as u32
-                            + match match (me, op) {
-                                (Game::Scissors, Game::Rock) => Ordering::Less,
-                                (Game::Rock, Game::Scissors) => Ordering::Greater,
-                                (x, y) => (x as u8).cmp(&(y as u8)),
-                            } {
-                                Ordering::Less => 0,
-                                Ordering::Equal => 3,
-                                Ordering::Greater => 6,
-                            }
-                    }
-                    _ => 0,
-                }
-            })
-            .sum()
+            match (plays.next(), plays.next()) {
+                (Some(Ok(op)), Some(Ok(me))) => op.play(&me),
+                _ => 0,
+            }
+        })
     }
 
-    pub fn part2(input: &str) -> u32 {
-        todo!()
+    fn part2(input: &str) -> u32 {
+        Self::common(input, |mut split| {
+            let op = split.next().map(|s| s.parse::<Play>());
+            let me = split.next().map(|s| s.parse::<Outcome>());
+
+            match (op, me) {
+                (Some(Ok(op)), Some(Ok(me))) => op.play_outcome(&me),
+                _ => 0,
+            }
+        })
+    }
+
+    fn name() -> String {
+        format!("{Self:?}")
+    }
+
+    fn input() -> &'static String {
+        lazy_static::lazy_static! {
+            pub static ref INPUT: String = crate::read_input_day(2);
+        }
+
+        &INPUT
     }
 }
 
+impl Day2 {
+    fn common(input: &str, solution: impl Fn(SplitWhitespace) -> u32) -> u32 {
+        input
+            .lines()
+            .map(|line| line.trim().split_whitespace())
+            .map(solution)
+            .sum()
+    }
+}
+
+use std::{cmp::Ordering, str::SplitWhitespace};
+
 #[derive(Debug, Clone, Copy)]
-pub enum Game {
+enum Play {
     Rock = 1,
     Paper = 2,
     Scissors = 3,
 }
 
-impl std::str::FromStr for Game {
+#[derive(Debug, Clone, Copy)]
+enum Outcome {
+    Win = 6,
+    Draw = 3,
+    Lose = 0,
+}
+
+impl std::str::FromStr for Play {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -58,27 +79,56 @@ impl std::str::FromStr for Game {
     }
 }
 
-lazy_static::lazy_static! {
-    pub static ref INPUT: String = crate::read_input_day(2);
+impl<'a> std::str::FromStr for Outcome {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "X" => Ok(Self::Lose),
+            "Y" => Ok(Self::Draw),
+            "Z" => Ok(Self::Win),
+            _ => Err(s.into()),
+        }
+    }
 }
 
-impl crate::Challenge for Day2 {
-    type FUNC = &'static dyn Fn(&str) -> u32;
-
-    fn parts() -> Vec<Self::FUNC> {
-        vec![&Self::part1, &Self::part2]
+impl Play {
+    fn play(&self, other: &Self) -> u32 {
+        self.cmp(other) as u32 + *other as u32
     }
 
-    fn input() -> &'static String {
-        &INPUT
+    fn cmp(&self, other: &Self) -> Outcome {
+        match match (other, self) {
+            (Play::Scissors, Play::Rock) => Ordering::Less,
+            (Play::Rock, Play::Scissors) => Ordering::Greater,
+            (&x, &y) => (x as u8).cmp(&(y as u8)),
+        } {
+            Ordering::Greater => Outcome::Win,
+            Ordering::Equal => Outcome::Draw,
+            Ordering::Less => Outcome::Lose,
+        }
     }
 
-    fn run(func: Self::FUNC) -> String {
-        format!("{:?}", func(Self::input()))
+    fn play_outcome(&self, outcome: &Outcome) -> u32 {
+        self.play(&self.from_outcome(outcome))
     }
 
-    fn name() -> String {
-        format!("{Self:?}")
+    fn from_outcome(&self, outcome: &Outcome) -> Self {
+        use Play::{Paper, Rock, Scissors};
+
+        match outcome {
+            Outcome::Win => match self {
+                Rock => Paper,
+                Paper => Scissors,
+                Scissors => Rock,
+            },
+            Outcome::Draw => *self,
+            Outcome::Lose => match self {
+                Rock => Scissors,
+                Paper => Rock,
+                Scissors => Paper,
+            },
+        }
     }
 }
 
@@ -94,14 +144,7 @@ mod tests {
     }
 
     #[test]
-    fn test2_part1() {
-        assert_eq!(Day2::part1("A Y\nB X\nC Z\nA X"), 19);
-        assert_eq!(Day2::part1("A Y\nB X\nC Z\nA X\nB Y"), 24);
-        assert_eq!(Day2::part1("A Y\nB X\nC Z\nA X\nB Y\nC Y"), 26);
-    }
-
-    #[test]
     fn test_part2() {
-        assert_eq!(Day2::part2(INPUT), 0);
+        assert_eq!(Day2::part2(INPUT), 12);
     }
 }
