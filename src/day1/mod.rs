@@ -1,13 +1,17 @@
-pub use crate::Day;
+use crate::Challenge;
+
+use itertools::Itertools;
 
 #[derive(Debug)]
 pub struct Day1;
 
-impl Day for Day1 {
+impl Challenge for Day1 {
+    /// Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
     fn part1(input: &str) -> u32 {
         Self::common(input).max().unwrap_or_default()
     }
 
+    /// Find the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?
     fn part2(input: &str) -> u32 {
         Self::common(input)
             .sorted_by(|a, b| b.cmp(a))
@@ -27,8 +31,6 @@ impl Day for Day1 {
         &INPUT
     }
 }
-
-use itertools::Itertools;
 
 impl Day1 {
     fn common(input: &str) -> impl Iterator<Item = u32> + '_ {

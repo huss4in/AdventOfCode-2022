@@ -1,13 +1,14 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-use AdventOfCode::prelude::*;
+use AdventOfCode::{Challenge, Day1 as Day};
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("Day1::part1", |b| {
-        b.iter(|| Day1::part1(black_box(Day1::input())))
+    c.bench_function(&format!("{}::part1", Day::name()), |b| {
+        b.iter(|| Day::part1(black_box(Day::input())))
     });
-    c.bench_function("Day1::part2", |b| {
-        b.iter(|| Day1::part2(black_box(Day1::input())))
+
+    c.bench_function(&format!("{}::part2", Day::name()), |b| {
+        b.iter(|| Day::part2(black_box(Day::input())))
     });
 }
 

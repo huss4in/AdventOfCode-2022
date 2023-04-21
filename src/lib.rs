@@ -1,15 +1,8 @@
 #![allow(non_snake_case)]
 
-pub mod prelude {
-    pub use crate::Day;
-
-    pub use super::day1::Day1;
-    pub use super::day2::Day2;
-}
-
 type FUNC = &'static dyn Fn(&str) -> u32;
 
-pub trait Day
+pub trait Challenge
 where
     Self: 'static,
 {
@@ -54,4 +47,7 @@ fn read_input_day(num: u32) -> String {
 }
 
 mod day1;
+pub use day1::*;
+
 mod day2;
+pub use day2::*;
