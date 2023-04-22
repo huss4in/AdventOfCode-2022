@@ -7,4 +7,5 @@ fn main() {
 
     Day1::run_all(0);
     Day2::run_all(0);
+    Day3::run_all(0);
 }
