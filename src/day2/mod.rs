@@ -1,8 +1,5 @@
 use crate::Challenge;
-use std::{
-    cmp::Ordering,
-    str::{FromStr, SplitWhitespace},
-};
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub struct Day2;
@@ -10,48 +7,30 @@ pub struct Day2;
 impl Challenge for Day2 {
     /// What would your total score be if everything goes exactly according to your strategy guide?
     fn part1(input: &str) -> u32 {
-        Self::common(input, |split| {
-            let mut plays = split.map(|s| s.parse::<Move>());
-
-            match (plays.next(), plays.next()) {
+        input
+            .lines()
+            .map(|line| line.trim().split_whitespace().map(Game::parse_move))
+            .map(|mut plays| match (plays.next(), plays.next()) {
                 (Some(Ok(op)), Some(Ok(me))) => op.play(me),
                 _ => 0,
-            }
-        })
+            })
+            .sum()
     }
 
     /// Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
     fn part2(input: &str) -> u32 {
-        Self::common(input, |mut split| {
-            let op = split.next().map(|s| s.parse::<Move>());
-            let me = split.next().map(|s| s.parse::<Outcome>());
-
-            match (op, me) {
-                (Some(Ok(op)), Some(Ok(me))) => op.play_outcome(me),
-                _ => 0,
-            }
-        })
-    }
-
-    fn name() -> String {
-        format!("{Self:?}")
-    }
-
-    fn input() -> &'static String {
-        lazy_static::lazy_static! {
-            pub static ref INPUT: String = crate::read_input_day(2);
-        }
-
-        &INPUT
-    }
-}
-
-impl Day2 {
-    fn common(input: &str, solution: impl Fn(SplitWhitespace) -> u32) -> u32 {
         input
             .lines()
             .map(|line| line.trim().split_whitespace())
-            .map(solution)
+            .map(|mut split| {
+                let op = split.next().map(Game::parse_move);
+                let me = split.next().map(Game::parse_outcome);
+
+                match (op, me) {
+                    (Some(Ok(op)), Some(Ok(me))) => op.play(me),
+                    _ => 0,
+                }
+            })
             .sum()
     }
 }
@@ -70,55 +49,55 @@ enum Outcome {
     Lose = 0,
 }
 
-impl FromStr for Move {
-    type Err = ();
+enum Game {
+    Move(Move),
+    Outcome(Outcome),
+}
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl Game {
+    fn parse_move(s: &str) -> Result<Self, ()> {
         match s {
-            "A" | "X" => Ok(Self::Rock),
-            "B" | "Y" => Ok(Self::Paper),
-            "C" | "Z" => Ok(Self::Scissors),
+            "A" | "X" => Ok(Self::Move(Move::Rock)),
+            "B" | "Y" => Ok(Self::Move(Move::Paper)),
+            "C" | "Z" => Ok(Self::Move(Move::Scissors)),
             _ => Err(()),
         }
     }
-}
 
-impl FromStr for Outcome {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn parse_outcome(s: &str) -> Result<Self, ()> {
         match s {
-            "X" => Ok(Self::Lose),
-            "Y" => Ok(Self::Draw),
-            "Z" => Ok(Self::Win),
+            "X" => Ok(Self::Outcome(Outcome::Lose)),
+            "Y" => Ok(Self::Outcome(Outcome::Draw)),
+            "Z" => Ok(Self::Outcome(Outcome::Win)),
             _ => Err(()),
+        }
+    }
+
+    fn play(self, other: Self) -> u32 {
+        match (self, other) {
+            (Self::Move(me), Self::Move(op)) => me.play_move(op),
+            (Self::Move(me), Self::Outcome(op)) => me.play_outcome(op),
+            _ => 0,
         }
     }
 }
 
 impl Move {
-    fn play(self, other: Self) -> u32 {
-        self.cmp(&other) as u32 + other as u32
-    }
-
-    fn cmp(&self, other: &Self) -> Outcome {
-        match match (other, self) {
-            (Move::Scissors, Move::Rock) => Ordering::Less,
-            (Move::Rock, Move::Scissors) => Ordering::Greater,
-            (&x, &y) => (x as u8).cmp(&(y as u8)),
-        } {
-            Ordering::Greater => Outcome::Win,
-            Ordering::Equal => Outcome::Draw,
-            Ordering::Less => Outcome::Lose,
-        }
+    fn play_move(self, other: Move) -> u32 {
+        other as u32
+            + match match (&other, &self) {
+                (Move::Scissors, Move::Rock) => Ordering::Less,
+                (Move::Rock, Move::Scissors) => Ordering::Greater,
+                (&x, &y) => (x as u8).cmp(&(y as u8)),
+            } {
+                Ordering::Greater => Outcome::Win,
+                Ordering::Equal => Outcome::Draw,
+                Ordering::Less => Outcome::Lose,
+            } as u32
     }
 
     fn play_outcome(self, outcome: Outcome) -> u32 {
-        self.play(self.from_outcome(outcome))
-    }
-
-    fn from_outcome(self, outcome: Outcome) -> Self {
-        match outcome {
+        self.play_move(match outcome {
             Outcome::Win => match self {
                 Move::Rock => Move::Paper,
                 Move::Paper => Move::Scissors,
@@ -130,7 +109,7 @@ impl Move {
                 Move::Paper => Move::Rock,
                 Move::Scissors => Move::Paper,
             },
-        }
+        })
     }
 }
 

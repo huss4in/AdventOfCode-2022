@@ -10,11 +10,8 @@ impl Challenge for Day3 {
     fn part1(input: &str) -> u32 {
         input
             .lines()
-            .map(|line| {
-                let (a, b) = line.split_at(line.len() / 2);
-
-                Self::int(a.chars().filter(|&c| b.contains(c)).next())
-            })
+            .map(|line| line.split_at(line.len() / 2))
+            .map(|(a, b)| Self::priority(Self::common([a, b])))
             .sum()
     }
 
@@ -22,32 +19,28 @@ impl Challenge for Day3 {
     fn part2(input: &str) -> u32 {
         input
             .lines()
-            .tuples::<(_, _, _)>()
-            .map(|(a, b, c)| {
-                Self::int(a.chars().filter(|&x| b.contains(x) && c.contains(x)).next())
-            })
+            .tuples()
+            .map(|(a, b, c)| Self::priority(Self::common([a, b, c])))
             .sum()
-    }
-
-    fn name() -> String {
-        format!("{Self:?}")
-    }
-
-    fn input() -> &'static String {
-        lazy_static::lazy_static! {
-            pub static ref INPUT: String = crate::read_input_day(3);
-        }
-
-        &INPUT
     }
 }
 
 impl Day3 {
-    fn int(char: Option<char>) -> u32 {
+    fn priority(char: Option<char>) -> u32 {
         match char {
             Some(c @ 'a'..='z') => c as u32 - 96,
             Some(c @ 'A'..='Z') => c as u32 - 38,
             _ => 0,
+        }
+    }
+
+    fn common<'a>(lists: impl IntoIterator<Item = &'a str> + Copy) -> Option<char> {
+        match lists.into_iter().next() {
+            Some(first) => first
+                .chars()
+                .filter(|&c| lists.into_iter().skip(1).all(|list| list.contains(c)))
+                .next(),
+            _ => None,
         }
     }
 }

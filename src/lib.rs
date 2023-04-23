@@ -6,28 +6,30 @@ pub trait Challenge
 where
     Self: 'static,
 {
-    fn name() -> String;
-
     fn part1(input: &str) -> u32;
     fn part2(input: &str) -> u32;
 
-    fn parts() -> [FUNC; 2] {
-        [&Self::part1, &Self::part2]
+    fn name() -> String {
+        std::any::type_name::<Self>()
+            .split("::")
+            .last()
+            .unwrap_or("Day?")
+            .to_string()
     }
 
-    fn input() -> &'static String;
+    fn input() -> String {
+        match Self::name().chars().last().map(|x| x.to_digit(10)) {
+            Some(Some(x)) => read_input_day(x),
+            _ => "".to_string(),
+        }
+    }
 
-    fn run_all(num: usize) {
-        for (i, func) in
-            Self::parts()
-                .into_iter()
-                .enumerate()
-                .take(if num == 0 { std::usize::MAX } else { num })
-        {
+    fn run() {
+        let input = Self::input();
+
+        for (i, func) in [&Self::part1 as FUNC, &Self::part2].into_iter().enumerate() {
             let time = std::time::Instant::now();
-
-            let result = func(Self::input());
-
+            let result = func(&input);
             let elapsed = time.elapsed().as_micros();
 
             println!(
