@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-type FUNC = &'static dyn Fn(&str) -> u32;
+type Func = &'static dyn Fn(&str) -> u32;
 
 pub trait Challenge
 where
@@ -27,7 +27,7 @@ where
     fn run() {
         let input = Self::input();
 
-        for (i, func) in [&Self::part1 as FUNC, &Self::part2].into_iter().enumerate() {
+        for (i, func) in [&Self::part1 as Func, &Self::part2].into_iter().enumerate() {
             let time = std::time::Instant::now();
             let result = func(&input);
             let elapsed = time.elapsed().as_micros();
@@ -44,8 +44,10 @@ where
 }
 
 fn read_input_day(num: u32) -> String {
-    std::fs::read_to_string(format!("src/day{num}/input"))
-        .expect(&format!("Error reading `day{num}` file"))
+    Result::expect(
+        std::fs::read_to_string(format!("src/day{num}/input")),
+        &format!("Error reading `day{num}` file"),
+    )
 }
 
 mod day1;

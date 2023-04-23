@@ -11,7 +11,7 @@ impl Challenge for Day3 {
         input
             .lines()
             .map(|line| line.split_at(line.len() / 2))
-            .map(|(a, b)| Self::priority(Self::common([a, b])))
+            .map(|(a, b)| Self::priority(Self::common(&[a, b])))
             .sum()
     }
 
@@ -20,27 +20,25 @@ impl Challenge for Day3 {
         input
             .lines()
             .tuples()
-            .map(|(a, b, c)| Self::priority(Self::common([a, b, c])))
+            .map(|(a, b, c)| Self::priority(Self::common(&[a, b, c])))
             .sum()
     }
 }
 
 impl Day3 {
+    pub fn common(lists: &[&str]) -> Option<char> {
+        lists
+            .iter()
+            .next()?
+            .chars()
+            .find(|&c| lists[1..].iter().all(|&list| list.contains(c)))
+    }
+
     fn priority(char: Option<char>) -> u32 {
         match char {
             Some(c @ 'a'..='z') => c as u32 - 96,
             Some(c @ 'A'..='Z') => c as u32 - 38,
             _ => 0,
-        }
-    }
-
-    fn common<'a>(lists: impl IntoIterator<Item = &'a str> + Copy) -> Option<char> {
-        match lists.into_iter().next() {
-            Some(first) => first
-                .chars()
-                .filter(|&c| lists.into_iter().skip(1).all(|list| list.contains(c)))
-                .next(),
-            _ => None,
         }
     }
 }

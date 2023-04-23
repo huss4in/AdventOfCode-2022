@@ -9,7 +9,7 @@ impl Challenge for Day2 {
     fn part1(input: &str) -> u32 {
         input
             .lines()
-            .map(|line| line.trim().split_whitespace().map(Game::parse_move))
+            .map(|line| line.split_whitespace().map(Game::parse_move))
             .map(|mut plays| match (plays.next(), plays.next()) {
                 (Some(Ok(op)), Some(Ok(me))) => op.play(me),
                 _ => 0,
@@ -21,7 +21,7 @@ impl Challenge for Day2 {
     fn part2(input: &str) -> u32 {
         input
             .lines()
-            .map(|line| line.trim().split_whitespace())
+            .map(|line| line.split_whitespace())
             .map(|mut split| {
                 let op = split.next().map(Game::parse_move);
                 let me = split.next().map(Game::parse_outcome);
