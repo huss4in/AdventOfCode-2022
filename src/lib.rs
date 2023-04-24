@@ -1,13 +1,14 @@
 #![allow(non_snake_case)]
+#![feature(iter_array_chunks)]
 
-type Func = &'static dyn Fn(&str) -> u32;
+type Func = &'static dyn Fn(&str) -> String;
 
 pub trait Challenge
 where
     Self: 'static,
 {
-    fn part1(input: &str) -> u32;
-    fn part2(input: &str) -> u32;
+    fn part1(input: &str) -> String;
+    fn part2(input: &str) -> String;
 
     fn name() -> String {
         std::any::type_name::<Self>()
@@ -54,8 +55,9 @@ mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 
-pub use day1::Day1;
-pub use day2::Day2;
-pub use day3::Day3;
-pub use day4::Day4;
+pub use day1::*;
+pub use day2::*;
+pub use day3::*;
+pub use day4::*;
