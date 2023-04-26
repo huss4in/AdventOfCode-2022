@@ -1,5 +1,3 @@
-// use itertools::Itertools;
-
 use crate::Challenge;
 
 #[derive(Debug)]
@@ -8,27 +6,29 @@ pub struct Day3;
 impl Challenge for Day3 {
     /// Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
     fn part1(input: &str) -> String {
-        input
-            .lines()
-            .map(|line| line.split_at(line.len() / 2))
-            .map(|(a, b)| Self::common(&[a, b]))
-            .sum::<usize>()
-            .to_string()
+        Self::commmon(input.lines().map(|line| {
+            let (a, b) = line.split_at(line.len() / 2);
+            Self::get_priority(&[a, b])
+        }))
     }
 
     // Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
     fn part2(input: &str) -> String {
-        input
-            .lines()
-            .array_chunks::<3>()
-            .map(|x| Self::common(&x))
-            .sum::<usize>()
-            .to_string()
+        Self::commmon(
+            input
+                .lines()
+                .array_chunks::<3>()
+                .map(|x| Self::get_priority(&x)),
+        )
     }
 }
 
 impl Day3 {
-    pub fn common(lists: &[&str]) -> usize {
+    fn commmon(iter: impl Iterator<Item = usize>) -> String {
+        iter.sum::<usize>().to_string()
+    }
+
+    fn get_priority(lists: &[&str]) -> usize {
         let first = lists[0];
         let lists = &lists[1..];
 

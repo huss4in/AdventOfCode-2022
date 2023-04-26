@@ -12,16 +12,6 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function(&format!("{}::part2", Day::name()), |b| {
         b.iter(|| Day::part2(black_box(&input)))
     });
-
-    c.bench_function(&format!("{}::common", Day::name()), |b| {
-        let input = [
-            "vJrwpWtwJgWrhcsFMMfFFhFp",
-            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
-            "PmmdzqPrVvPwwTWBwg",
-        ];
-
-        b.iter(|| Day::common(black_box(&input)))
-    });
 }
 
 criterion_group!(benches, criterion_benchmark);
