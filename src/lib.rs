@@ -34,10 +34,10 @@ where
             let elapsed = time.elapsed().as_micros();
 
             println!(
-                "{}::part{}() -> {:<7} in {} ms\n",
+                "{}::part{}() -> {:<11} in {} ms\n",
                 Self::name(),
                 i + 1,
-                result,
+                format!("'{}'", result),
                 elapsed as f64 / 1000.0,
             );
         }
