@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 use crate::Challenge;
 
 #[derive(Debug)]
@@ -7,56 +5,36 @@ pub struct Day06;
 
 impl Challenge for Day06 {
     fn part1(input: &str) -> String {
-        const NUMBER: usize = 4;
-
-        let mut filter = 0u32;
-
-        input
-            .chars()
-            .take(NUMBER - 1)
-            .for_each(|c| filter ^= 1 << (c as u32 % 32));
-
-        match input
-            .chars()
-            .tuple_windows()
-            .position(|(first, _, _, last)| {
-                filter ^= 1 << (last as u32 % 32);
-                let result = filter.count_ones() == NUMBER as u32;
-                filter ^= 1 << (first as u32 % 32);
-                result
-            })
-            .map(|x| x + NUMBER)
-        {
-            Some(x) => x.to_string(),
-            None => "None".into(),
-        }
+        Self::common(input, 4)
     }
 
     fn part2(input: &str) -> String {
-        const NUMBER: usize = 14;
+        Self::common(input, 14)
+    }
+}
 
+impl Day06 {
+    fn common(input: &str, number: usize) -> String {
         let mut idx = 0;
 
-        let input: Vec<char> = input.chars().collect();
-
-        while let Some(slice) = input.get(idx..idx + NUMBER) {
+        while let Some(slice) = input.as_bytes().get(idx..idx + number) {
             let mut filter = 0u32;
 
-            if let Some(pos) = slice.into_iter().rposition(|&char| {
-                let bit_idx = char as u32 % 32;
-
-                let res = filter & (1 << bit_idx) != 0;
-
-                filter |= 1 << bit_idx;
-                res
+            if let Some(pos) = slice.into_iter().rposition(|byte| {
+                if filter & 1 << byte % 32 == 0 {
+                    filter |= 1 << byte % 32;
+                    false
+                } else {
+                    true
+                }
             }) {
                 idx += pos + 1;
             } else {
-                return (idx + NUMBER).to_string();
+                return (idx + number).to_string();
             }
         }
 
-        "None".into()
+        0.to_string()
     }
 }
 
