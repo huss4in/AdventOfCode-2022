@@ -15,25 +15,25 @@ lazy_static = "1.4.0"
 criterion = { version = "0.4.0", features = ["html_reports"] }
 
 [[bench]]
-name = "1"
+name = "01"
 harness = false
 
 [[bench]]
-name = "2"
+name = "02"
 harness = false
 
 [[bench]]
-name = "3"
+name = "03"
 harness = false
 
 [[bench]]
-name = "4"
+name = "04"
 harness = false
 
 [[bench]]
-name = "5"
+name = "05"
 harness = false
 
 [[bench]]
-name = "6"
+name = "06"
 harness = false
