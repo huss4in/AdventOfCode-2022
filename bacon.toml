@@ -3,7 +3,7 @@
 # Bacon repository: https://github.com/Canop/bacon
 # Complete help on configuration: https://dystroy.org/bacon/config/
 
-default_job = "run"
+default_job = "run-all"
 
 [jobs.check]
 command = ["cargo", "check", "--color", "always"]
@@ -42,8 +42,101 @@ on_success = "back"                                                    # so that
 # properly parsed.
 # If you want to pass options to your program, a `--` separator
 # will be needed.
-[jobs.run]
-command = ["cargo", "run", "--color", "always"]
+[jobs.run-all]
+command = [
+  "cargo",
+  "run",
+  "--color",
+  "always",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+  "2021",
+  "2022",
+]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2015]
+command = ["cargo", "run", "--color", "always", "2015"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2015]
+command = ["cargo", "test", "--color", "always", "2015"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2016]
+command = ["cargo", "test", "--color", "always", "2016"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2016]
+command = ["cargo", "test", "--color", "always", "2016"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2017]
+command = ["cargo", "test", "--color", "always", "2017"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2017]
+command = ["cargo", "test", "--color", "always", "2017"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2018]
+command = ["cargo", "test", "--color", "always", "2018"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2018]
+command = ["cargo", "test", "--color", "always", "2018"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2019]
+command = ["cargo", "test", "--color", "always", "2019"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2019]
+command = ["cargo", "test", "--color", "always", "2019"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2020]
+command = ["cargo", "test", "--color", "always", "2020"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2020]
+command = ["cargo", "test", "--color", "always", "2020"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2021]
+command = ["cargo", "test", "--color", "always", "2021"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2021]
+command = ["cargo", "test", "--color", "always", "2021"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.run-2022]
+command = ["cargo", "test", "--color", "always", "2022"]
+need_stdout = true
+allow_warnings = true
+
+[jobs.test-2022]
+command = ["cargo", "test", "--color", "always", "2022"]
 need_stdout = true
 allow_warnings = true
 
@@ -52,3 +145,28 @@ allow_warnings = true
 # Shortcuts to internal functions (scrolling, toggling, etc.)
 # should go in your personal global prefs.toml file instead.
 [keybindings]
+r = "job:run-all"
+
+5 = "job:run-2015"
+ctrl-5 = "job:test-2015"
+
+6 = "job:run-2016"
+ctrl-6 = "job:test-2016"
+
+7 = "job:run-2017"
+ctrl-7 = "job:test-2017"
+
+8 = "job:run-2018"
+ctrl-8 = "job:test-2018"
+
+9 = "job:run-2019"
+ctrl-9 = "job:test-2019"
+
+0 = "job:run-2020"
+ctrl-0 = "job:test-2020"
+
+1 = "job:run-2021"
+ctrl-1 = "job:test-2021"
+
+2 = "job:run-2022"
+ctrl-2 = "job:test-2022"
